@@ -2,6 +2,8 @@ package com.coding.sales;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,7 +37,7 @@ public class DealOrderForm {
     private List<OrderItemCommand> items;//订单信息
     private List<PaymentCommand> payments;//支付信息
     List<PaymentRepresentation> paymentlist;
-    List<DiscountItemRepresentation> discountslist;
+    List<DiscountItemRepresentation> discountslist = new ArrayList<DiscountItemRepresentation>();
     List<OrderItemRepresentation> orderItems;
     private List<String> discounts;//优惠信息
     
@@ -71,9 +73,18 @@ public class DealOrderForm {
 		totalPrice = calculatePaySum().toString();
 		dealIntegral(totalPrice);
 		addlist();
+		Date createDate = null;
+		try {
+			SimpleDateFormat sfd = new SimpleDateFormat("YYYY-MM-DD hh:mm:ss");
+			 createDate = sfd.parse(createTime);
+		} catch (Exception e) {
+			e.fillInStackTrace();
+		}
 		
-		OrderRepresentation result = new OrderRepresentation(orderId,new Date(),memberId,memberName
-				,oldMemberType,newMemberType,Integer.parseInt("10170"),Integer.parseInt("10170")
+		memberPointsIncreased = new BigDecimal(BigDecimal.valueOf(Double.parseDouble(memberPointsIncreased)).stripTrailingZeros().toPlainString()).toString();
+		newIntegral = new BigDecimal(BigDecimal.valueOf(Double.parseDouble(newIntegral)).stripTrailingZeros().toPlainString()).toString();
+		OrderRepresentation result = new OrderRepresentation(orderId,createDate,memberId,memberName
+				,oldMemberType,newMemberType,Integer.parseInt(memberPointsIncreased),Integer.parseInt(newIntegral)
 				,orderItems,PretotalDiscountPrice,discountslist,totalDiscountPrice,calculatePaySum(),paymentlist,discounts);
 		
 		return result;
@@ -91,12 +102,13 @@ public class DealOrderForm {
 			for(Goods goods:goodsList){
 				if(goods.getGoodsId().equals(product)){
 					String price = goods.getPrice();//商品金额
+					String productName = goods.getGoodsName();
 					String discount = goods.getEvents().getDiscount();//打折券
 					
 					bPretotalDiscountPrice = amount.multiply(new BigDecimal(price));
 					
 					String fullReduction = goods.getEvents().getFullReduction();//满减活动
-					BigDecimal preferentialPricebyfullReduction = calculateSinglePriceforfullReduction(price,amount,fullReduction);
+					BigDecimal preferentialPricebyfullReduction = calculateSinglePriceforfullReduction(product,productName,price,amount,fullReduction);
 					BigDecimal preferentialPricebyDiscount = calculateSinglePriceforDiscount(price,amount,discount);
 					if(preferentialPricebyfullReduction.compareTo(preferentialPricebyDiscount)>0){
 						PaySum = preferentialPricebyfullReduction;
@@ -115,7 +127,7 @@ public class DealOrderForm {
 	}
 	
 	//根据满减计算单个产品价格
-	public BigDecimal calculateSinglePriceforfullReduction(String price,BigDecimal amount,String fullReduction){
+	public BigDecimal calculateSinglePriceforfullReduction(String product,String productName,String price,BigDecimal amount,String fullReduction){
 		BigDecimal bprice=new BigDecimal(price);
 		BigDecimal PriceAll = amount.multiply(bprice);
 		BigDecimal SinglePriceforfullReduction = PriceAll;
@@ -124,7 +136,6 @@ public class DealOrderForm {
 		for(int i = 0;i<fullReductionArray.length;i++){
 			BigDecimal preferentialPrice = SinglePriceforfullReduction ;
 			String fullRed = fullReductionArray[0];
-			System.out.println(fullRed);
 			if(fullRed.equals(FullReduction.full1000cut10)){
 				if(PriceAll.compareTo(new BigDecimal("1000"))>0){
 					preferentialPrice = PriceAll.subtract(new BigDecimal("10"));
@@ -147,8 +158,8 @@ public class DealOrderForm {
 					preferentialPrice = PriceAll.subtract(bprice.divide(new BigDecimal("2")));
 				}
 			}
-			System.out.println(SinglePriceforfullReduction.toString());
-			System.out.println(preferentialPrice.toString());
+			DiscountItemRepresentation dis = new DiscountItemRepresentation(product,productName,new BigDecimal("212"));
+			discountslist.add(dis);
 			SinglePriceforfullReduction = setSinglePriceforfullReduction(SinglePriceforfullReduction,preferentialPrice);
 		}	
 		return SinglePriceforfullReduction;
@@ -183,9 +194,7 @@ public class DealOrderForm {
 				Card card = cus.getCard();
 				Double cc = card.getBaseIntegral();
 				oldIntegral = cus.getSumIntegral();
-				System.out.println("oldIntegral"+oldIntegral);
-				System.out.println("totalPrice"+totalPrice);
-				System.out.println(cc);
+				System.out.println("原卡种"+cc);
 				newIntegral = new BigDecimal(oldIntegral).add(new BigDecimal(totalPrice).multiply(new BigDecimal(cc))).toString();
 				if(cc == BaseIntegral.one){
 					oldMemberType = "普卡";
@@ -198,6 +207,7 @@ public class DealOrderForm {
 				}
 				double doldIntegral = Double.parseDouble(oldIntegral);
 				double dnewIntegral = Double.parseDouble(newIntegral);
+				System.out.println("新卡种"+dnewIntegral);
 				memberPointsIncreased = dnewIntegral-doldIntegral +"";
 				if(0<dnewIntegral && dnewIntegral<10000){
 					newMemberType = "普卡";
@@ -213,14 +223,12 @@ public class DealOrderForm {
 	}
 	
 	public void addlist(){
-		paymentlist = new ArrayList<PaymentRepresentation>();
-	    discountslist = new ArrayList<DiscountItemRepresentation>();
+		
 	    orderItems = new ArrayList<OrderItemRepresentation>();
-	    
-	    PaymentRepresentation pp = new PaymentRepresentation("余额",new BigDecimal("2"));
+	    paymentlist = new ArrayList<PaymentRepresentation>();
+	    PaymentRepresentation pp = new PaymentRepresentation("余额支付",new BigDecimal("2"));
 	    paymentlist.add(pp);
-	    DiscountItemRepresentation dis = new DiscountItemRepresentation("111","222",new BigDecimal("2"));
-	    discountslist.add(dis);
+	    
 	    OrderItemRepresentation or = new OrderItemRepresentation("111","222",new BigDecimal("2"),new BigDecimal("2"),new BigDecimal("2"));
 	    
 	    orderItems.add(or);

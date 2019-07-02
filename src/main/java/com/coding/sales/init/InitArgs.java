@@ -76,8 +76,24 @@ public class InitArgs {
 		goods.setGoodsName((String)object[1]);
 		goods.setUnit((String)object[2]);
 		goods.setPrice((String)object[3]);
-		goods.setEvents((String)object[3]);
+		goods.setEvents((Events)object[4]);
 		return goods;
+	}
+
+	public ArrayList<Customer> getCuslist() {
+		return cuslist;
+	}
+
+	public void setCuslist(ArrayList<Customer> cuslist) {
+		this.cuslist = cuslist;
+	}
+
+	public ArrayList<Goods> getGoodsList() {
+		return goodsList;
+	}
+
+	public void setGoodsList(ArrayList<Goods> goodsList) {
+		this.goodsList = goodsList;
 	}
 	
 }

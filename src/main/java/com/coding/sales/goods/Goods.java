@@ -1,12 +1,14 @@
 package com.coding.sales.goods;
 
+import com.coding.sales.goods.discount.Events;
+
 
 public class Goods {
 	private String GoodsId;
 	private String GoodsName;
 	private String unit;
 	private String price;
-	private String events;
+	private Events events;
 	public String getGoodsId() {
 		return GoodsId;
 	}
@@ -31,10 +33,10 @@ public class Goods {
 	public void setUnit(String unit) {
 		this.unit = unit;
 	}
-	public String getEvents() {
+	public Events getEvents() {
 		return events;
 	}
-	public void setEvents(String events) {
+	public void setEvents(Events events) {
 		this.events = events;
 	}
 }

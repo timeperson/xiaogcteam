@@ -34,7 +34,8 @@ public class OrderApp {
         OrderRepresentation result = null;
 
         //TODO: 请完成需求指定的功能
-
+        DealOrderForm deal = new DealOrderForm();
+        result = deal.dealOrder(command);
         return result;
     }
 }

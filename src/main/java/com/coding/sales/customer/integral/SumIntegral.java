@@ -1,13 +1,9 @@
 package com.coding.sales.customer.integral;
 
 public class SumIntegral {
-	private String sumIntegral;
-
-	public String getSumIntegral() {
-		return sumIntegral;
-	}
-
-	public void setSumIntegral(String sumIntegral) {
-		this.sumIntegral = sumIntegral;
-	}
+	public static String Integral_0 = "0";
+	public static String Integral_10000 = "10000";
+	public static String Integral_50000 = "50000";
+	public static String Integral_100000 = "100000";
 }
+

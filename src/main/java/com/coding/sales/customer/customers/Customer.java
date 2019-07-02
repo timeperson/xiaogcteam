@@ -1,13 +1,12 @@
 package com.coding.sales.customer.customers;
 
 import com.coding.sales.customer.cards.Card;
-import com.coding.sales.customer.integral.SumIntegral;
 
 public class Customer {
 	private String CustomerId;
 	private String CustomerName;
 	private Card card; 
-	private SumIntegral sumIntegral;
+	private String sumIntegral;
 	
 	public String getCustomerId() {
 		return CustomerId;
@@ -27,10 +26,10 @@ public class Customer {
 	public void setCard(Card card) {
 		this.card = card;
 	}
-	public SumIntegral getSumIntegral() {
+	public String getSumIntegral() {
 		return sumIntegral;
 	}
-	public void setSumIntegral(SumIntegral sumIntegral) {
+	public void setSumIntegral(String sumIntegral) {
 		this.sumIntegral = sumIntegral;
 	}
 }
